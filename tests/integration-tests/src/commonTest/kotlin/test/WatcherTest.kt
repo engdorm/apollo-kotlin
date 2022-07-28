@@ -28,12 +28,15 @@ import com.apollographql.apollo3.testing.enqueueTestResponse
 import com.apollographql.apollo3.testing.receiveOrTimeout
 import com.apollographql.apollo3.testing.runTest
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -104,6 +107,32 @@ class WatcherTest {
 
       job.cancel()
     }
+  }
+
+  /**
+   * Executing the same query out of band should update the watcher
+   *
+   * Also, this test checks that the watcher gets control fast enough to subscribe to
+   * cache changes
+   */
+  @Test
+  fun primeTheCacheAfterCallingWatch() = runTest(before = { setUp() }) {
+    val query = EpisodeHeroNameQuery(Episode.EMPIRE)
+    val flow = apolloClient.query(query)
+        .fetchPolicy(FetchPolicy.CacheOnly)
+        .watch()
+        .onEach {
+          println("Got: ${it.data}")
+        }
+
+    flow.launchIn(GlobalScope)
+
+    delay(1000)
+
+    apolloClient.enqueueTestResponse(query, episodeHeroNameData)
+    apolloClient.query(query).fetchPolicy(FetchPolicy.NetworkOnly).execute()
+
+    delay(1000)
   }
 
   @Test
