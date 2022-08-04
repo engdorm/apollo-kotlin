@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+# Version TODO
+
+_TODO_
+
+## 💙️ External contributors
+
+TODO
+
+## ✨️ [new] Kotlin 1.7 (#4314)
+
+Starting with this release, Apollo Kotlin is built with Kotlin 1.7.10. This doesn't impact Android and JVM projects (the minimum supported version of Kotlin continues to be 1.5) but if you are on a project using Native, you will need to update the Kotlin version to 1.7.0+.
+
 # Version 3.5.0 
 
 _2022-08-01_
