@@ -64,7 +64,7 @@
       "Overview": "/testing/overview",
       "Mocking HTTP responses": "/testing/mocking-http-responses",
       "Mocking GraphQL responses": "/testing/mocking-graphql-responses",
-      "Test builders": "/testing/test-builders",
+      "Data builders": "/testing/data-builders",
       "UI Tests": "/testing/ui-tests"
     },
     "Advanced": {

@@ -1,6 +1,7 @@
 package test
 
 import MyLong
+import com.apollographql.apollo3.api.DefaultFakeResolver
 import com.apollographql.apollo3.api.FakeResolver
 import com.apollographql.apollo3.api.FakeResolverContext
 import data.builders.GetAliasesQuery
@@ -14,6 +15,7 @@ import data.builders.GetPartialQuery
 import data.builders.PutIntMutation
 import data.builders.type.Direction
 import data.builders.type.Lion
+import data.builders.type.__Schema
 import data.builders.type.buildCat
 import data.builders.type.buildLion
 import kotlin.test.Test
@@ -167,28 +169,31 @@ class DataBuilderTest {
     )
   }
 
-  class MyFakeResolver : FakeResolver {
-    override fun resolveLeaf(context: FakeResolverContext): Any {
-      return when (context.mergedField.type.leafType().name) {
-        "Long1" -> "45" // build-time => this needs to be resolved to Json
-        "Long2" -> MyLong(46) // run-time
-        "Long3" -> 47L // mapped to Any
-        else -> error("")
-      }
-    }
+class MyFakeResolver : FakeResolver {
+  private val delegate = DefaultFakeResolver(__Schema.all)
 
-    override fun resolveListSize(context: FakeResolverContext): Int {
-      return 1
-    }
-
-    override fun resolveMaybeNull(context: FakeResolverContext): Boolean {
-      return false
-    }
-
-    override fun resolveTypename(context: FakeResolverContext): String {
-      TODO("Not yet implemented")
+  override fun resolveLeaf(context: FakeResolverContext): Any {
+    return when (context.mergedField.type.leafType().name) {
+      "Int" -> -1 // Always use -1 for Ints
+      else -> delegate.resolveLeaf(context)
     }
   }
+
+  override fun resolveListSize(context: FakeResolverContext): Int {
+    // Delegate to the default behaviour
+    return delegate.resolveListSize(context)
+  }
+
+  override fun resolveMaybeNull(context: FakeResolverContext): Boolean {
+    // Never
+    return false
+  }
+
+  override fun resolveTypename(context: FakeResolverContext): String {
+    // Delegate to the default behaviour
+    return delegate.resolveTypename(context)
+  }
+}
 
   @Test
   fun customScalarFakeValues() {

@@ -9,6 +9,28 @@ _TODO_
 
 TODO
 
+## ✨️ [new] Data Builders (#4321)
+
+Apollo Kotlin 3.0 introduced [test builders](https://www.apollographql.com/docs/kotlin/testing/test-builders/). While they are working, they have several limitations. The main one was that being [response based](https://www.apollographql.com/docs/kotlin/advanced/response-based-codegen#the-responsebased-codegen), they could generate a lot of code. Also, they required passing custom scalars using their Json encoding, which is cumbersome. 
+
+The [data builders](https://www.apollographql.com/docs/kotlin/testing/data-builders/) are a simpler version of the test builders that generate builders based on schema types. This means most of the generated code is shared between all your implementations except for a top level `Data {}` function in each of your operation:
+
+```kotlin
+// Replace
+val data = GetHeroQuery.Data {
+  hero = humanHero {
+    name = "Luke"
+  }
+} 
+
+// With
+val data = GetHeroQuery.Data {
+  hero = buildHuman {
+    name = "Luke"
+  }
+} 
+```
+
 ## ✨️ [new] Kotlin 1.7 (#4314)
 
 Starting with this release, Apollo Kotlin is built with Kotlin 1.7.10. This doesn't impact Android and JVM projects (the minimum supported version of Kotlin continues to be 1.5) but if you are on a project using Native, you will need to update the Kotlin version to 1.7.0+.
